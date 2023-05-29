@@ -108,16 +108,19 @@ func resourceMemberRolesRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	items := d.Get("role").(*schema.Set).List()
-	roles := make([]*RoleSchema, 0, len(items))
+	roles := make([]interface{}, 0, len(items))
 
 	for _, r := range items {
 		v, _ := convertToRoleSchema(r)
 
-		if hasRole(member, v.RoleId) {
-			roles = append(roles, &RoleSchema{RoleId: v.RoleId, HasRole: true})
-		} else {
-			roles = append(roles, &RoleSchema{RoleId: v.RoleId, HasRole: false})
-		}
+		roles = append(roles, map[string]interface{}{
+			"role_id":  v.RoleId.String(),
+			"has_role": hasRole(member, v.RoleId),
+		})
+	}
+
+	if err := d.Set("role", roles); err != nil {
+		return diag.Errorf("Could not set roles: %s", err.Error())
 	}
 
 	return diags
