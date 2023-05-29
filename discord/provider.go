@@ -48,6 +48,7 @@ func Provider() *schema.Provider {
 			"discord_server":         dataSourceDiscordServer(),
 			"discord_member":         dataSourceDiscordMember(),
 			"discord_system_channel": dataSourceDiscordSystemChannel(),
+			"discord_channel":        dataSourceDiscordChannel(),
 		},
 
 		ConfigureContextFunc: providerConfigure,
