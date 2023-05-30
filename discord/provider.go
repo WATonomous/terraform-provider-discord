@@ -36,6 +36,7 @@ func Provider() *schema.Provider {
 			"discord_role":               resourceDiscordRole(),
 			"discord_role_everyone":      resourceDiscordRoleEveryone(),
 			"discord_member_roles":       resourceDiscordMemberRoles(),
+			"discord_member_nick":        resourceDiscordMemberNick(),
 			"discord_message":            resourceDiscordMessage(),
 			"discord_system_channel":     resourceDiscordSystemChannel(),
 		},
