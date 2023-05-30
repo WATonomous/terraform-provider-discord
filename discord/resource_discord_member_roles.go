@@ -3,6 +3,7 @@ package discord
 import (
 	"encoding/json"
 	"log"
+	"strings"
 
 	"github.com/andersfylling/disgord"
 	"github.com/andersfylling/snowflake/v5"
@@ -104,6 +105,13 @@ func resourceMemberRolesRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	member, err := client.Guild(serverId).Member(userId).Get()
 	if err != nil {
+		// If error string contains "Unknown Member", it's because the member is not in the server.
+		// This is not an error, so we just return an empty ID.
+		if strings.Contains(err.Error(), "Unknown Member") {
+			log.Default().Printf("Member %s not found in server %s. Removing from state.", userId.String(), serverId.String())
+			d.SetId("")
+			return nil
+		}
 		return diag.Errorf("Could not get member %s in %s: %s", userId.String(), serverId.String(), err.Error())
 	}
 
