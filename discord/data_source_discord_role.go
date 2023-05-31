@@ -27,7 +27,7 @@ func dataSourceDiscordRole() *schema.Resource {
 				Optional:     true,
 			},
 			"position": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"color": {
@@ -89,7 +89,7 @@ func dataSourceDiscordRoleRead(ctx context.Context, d *schema.ResourceData, m in
 	d.SetId(role.ID.String())
 	d.Set("role_id", role.ID.String())
 	d.Set("name", role.Name)
-	d.Set("position", len(server.Roles)-role.Position)
+	d.Set("position", role.Position)
 	d.Set("color", role.Color)
 	d.Set("hoist", role.Hoist)
 	d.Set("mentionable", role.Mentionable)
