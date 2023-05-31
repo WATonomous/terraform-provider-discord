@@ -27,7 +27,7 @@ func dataSourceDiscordRole() *schema.Resource {
 				Optional:     true,
 			},
 			"position": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"color": {
