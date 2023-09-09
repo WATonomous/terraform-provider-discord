@@ -39,6 +39,7 @@ func Provider() *schema.Provider {
 			"discord_member_nick":        resourceDiscordMemberNick(),
 			"discord_message":            resourceDiscordMessage(),
 			"discord_system_channel":     resourceDiscordSystemChannel(),
+			"discord_webhook":            resourceDiscordWebhook(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{

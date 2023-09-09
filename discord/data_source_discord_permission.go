@@ -56,6 +56,7 @@ func dataSourceDiscordPermission() *schema.Resource {
 		"start_embedded_activities": 0x8000000000,
 		"moderate_members":          0x10000000000,
 		"use_soundboard":            0x40000000000,
+		"create_events":             0x100000000000,
 		"use_external_sounds":       0x200000000000,
 	}
 
