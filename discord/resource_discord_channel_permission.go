@@ -1,10 +1,10 @@
 package discord
 
 import (
-	"fmt"
-	"strconv"
+	"log"
 
 	"github.com/andersfylling/disgord"
+	"github.com/andersfylling/snowflake/v5"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -75,7 +75,7 @@ func resourceChannelPermissionCreate(ctx context.Context, d *schema.ResourceData
 	}); err != nil {
 		return diag.Errorf("Failed to update channel permissions %s: %s", channelId.String(), err.Error())
 	} else {
-		d.SetId(strconv.Itoa(Hashcode(fmt.Sprintf("%s:%s:%s", channelId, overwriteId, d.Get("type").(string)))))
+		d.SetId(generateThreePartId(channelId.String(), overwriteId.String(), d.Get("type").(string)))
 
 		return diags
 	}
@@ -85,15 +85,29 @@ func resourceChannelPermissionRead(ctx context.Context, d *schema.ResourceData, 
 	var diags diag.Diagnostics
 	client := m.(*Context).Client
 
-	channelId := getId(d.Get("channel_id").(string))
-	overwriteId := getId(d.Get("overwrite_id").(string))
+	var channelId, overwriteId snowflake.Snowflake
+	var permissionType uint
+
+	cId, oId, pt, err := parseThreeIds(d.Id())
+	if err != nil {
+		log.Default().Printf("Unable to parse IDs out of the resource ID. Falling back on legacy config behavior.")
+		channelId = getId(d.Get("channel_id").(string))
+		overwriteId = getId(d.Get("overwrite_id").(string))
+		permissionType, _ = getDiscordChannelPermissionType(d.Get("type").(string))
+	} else {
+		channelId = getId(cId)
+		overwriteId = getId(oId)
+		permissionType, _ = getDiscordChannelPermissionType(pt)
+
+		d.Set("channel_id", channelId.String())
+		d.Set("overwrite_id", overwriteId.String())
+		d.Set("type", pt)
+	}
 
 	channel, err := client.Channel(channelId).Get()
 	if err != nil {
 		return diag.Errorf("Failed to find channel %s: %s", channelId.String(), err.Error())
 	}
-
-	permissionType, _ := getDiscordChannelPermissionType(d.Get("type").(string))
 
 	for _, x := range channel.PermissionOverwrites {
 		if uint(x.Type) == uint(permissionType) && x.ID == overwriteId {
