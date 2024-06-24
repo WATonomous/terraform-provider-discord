@@ -41,6 +41,7 @@ func Provider(version string) func() *schema.Provider {
 				"discord_role":               resourceDiscordRole(),
 				"discord_role_everyone":      resourceDiscordRoleEveryone(),
 				"discord_member_roles":       resourceDiscordMemberRoles(),
+				"discord_member_nick":        resourceDiscordMemberNick(),
 				"discord_message":            resourceDiscordMessage(),
 				"discord_system_channel":     resourceDiscordSystemChannel(),
 				"discord_webhook":            resourceDiscordWebhook(),
@@ -52,7 +53,9 @@ func Provider(version string) func() *schema.Provider {
 				"discord_local_image":    dataSourceDiscordLocalImage(),
 				"discord_role":           dataSourceDiscordRole(),
 				"discord_server":         dataSourceDiscordServer(),
+				"discord_channel":        dataSourceDiscordChannel(),
 				"discord_member":         dataSourceDiscordMember(),
+				"discord_members":        dataSourceDiscordMembers(),
 				"discord_system_channel": dataSourceDiscordSystemChannel(),
 			},
 

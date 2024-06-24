@@ -131,11 +131,19 @@ func dataSourceMemberRead(ctx context.Context, d *schema.ResourceData, m interfa
 		d.Set("premium_since", nil)
 	}
 
+	var discriminator string
+	if member.User.Discriminator == "0" {
+		// Use an empty string to indicate no discriminator
+		discriminator = ""
+	} else {
+		discriminator = member.User.Discriminator
+	}
+
 	d.SetId(member.User.ID)
 	d.Set("joined_at", member.JoinedAt.String())
 	d.Set("roles", roles)
 	d.Set("username", member.User.Username)
-	d.Set("discriminator", member.User.Discriminator)
+	d.Set("discriminator", discriminator)
 	d.Set("avatar", member.User.Avatar)
 	d.Set("nick", member.Nick)
 

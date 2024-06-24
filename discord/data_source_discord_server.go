@@ -92,14 +92,15 @@ func dataSourceDiscordServerRead(ctx context.Context, d *schema.ResourceData, m 
 		}
 	}
 	if v, ok := d.GetOk("name"); ok {
-		guilds, err := client.UserGuilds(1000, "", "", false, discordgo.WithContext(ctx))
+		// Discord API supports max 200 guilds per request
+		guilds, err := client.UserGuilds(200, "", "", false, discordgo.WithContext(ctx))
 		if err != nil {
-			return diag.Errorf("Failed to fetch server %s: %s", v.(string), err.Error())
+			return diag.Errorf("Failed to fetch server list: %s", err.Error())
 		}
 
 		for _, s := range guilds {
 			if s.Name == v.(string) {
-				server, err = client.Guild(v.(string), discordgo.WithContext(ctx))
+				server, err = client.Guild(s.ID, discordgo.WithContext(ctx))
 				if err != nil {
 					return diag.Errorf("Failed to fetch server %s: %s", v.(string), err.Error())
 				}
@@ -108,7 +109,7 @@ func dataSourceDiscordServerRead(ctx context.Context, d *schema.ResourceData, m 
 		}
 
 		if server == nil {
-			return diag.Errorf("Failed to fetch server %s", v.(string))
+			return diag.Errorf("Failed to fetch server %s (nil response)", v.(string))
 		}
 	}
 
