@@ -61,6 +61,15 @@ func resourceRoleEveryoneRead(ctx context.Context, d *schema.ResourceData, m int
 	d.SetId(serverId)
 
 	if role, err := getRole(ctx, client, serverId, serverId); err != nil {
+		if err == ErrRoleNotFound {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  "Everyone role not found",
+				Detail:   "The @everyone role no longer exists on Discord. It has been removed from state.",
+			})
+			d.SetId("")
+			return diags
+		}
 		return diag.Errorf("Failed to fetch role %s: %s", d.Id(), err.Error())
 	} else {
 		d.Set("permissions", role.Permissions)
