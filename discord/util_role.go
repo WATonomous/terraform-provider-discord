@@ -2,10 +2,13 @@ package discord
 
 import (
 	"context"
+	"errors"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 )
+
+var ErrRoleNotFound = errors.New("role not found")
 
 type Role struct {
 	ServerId string
@@ -82,6 +85,10 @@ func getRole(ctx context.Context, client *discordgo.Session, serverId string, ro
 	if roles, err := client.GuildRoles(serverId, discordgo.WithContext(ctx)); err != nil {
 		return nil, err
 	} else {
-		return findRoleById(roles, roleId), nil
+		role := findRoleById(roles, roleId)
+		if role == nil {
+			return nil, ErrRoleNotFound
+		}
+		return role, nil
 	}
 }

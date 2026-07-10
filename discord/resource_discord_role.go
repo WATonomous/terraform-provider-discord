@@ -148,6 +148,15 @@ func resourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	role, err := getRole(ctx, client, d.Get("server_id").(string), d.Id())
 
 	if err != nil {
+		if err == ErrRoleNotFound {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  "Role not found",
+				Detail:   "The role no longer exists on Discord. It has been removed from state.",
+			})
+			d.SetId("")
+			return diags
+		}
 		return diag.Errorf("Failed to fetch role %s: %s", d.Id(), err.Error())
 	}
 
@@ -176,6 +185,15 @@ func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	roleId := d.Id()
 	role, err := getRole(ctx, client, serverId, roleId)
 	if err != nil {
+		if err == ErrRoleNotFound {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  "Role not found",
+				Detail:   "The role no longer exists on Discord. It has been removed from state.",
+			})
+			d.SetId("")
+			return diags
+		}
 		return diag.Errorf("Failed to fetch role %s: %s", d.Id(), err.Error())
 	}
 
